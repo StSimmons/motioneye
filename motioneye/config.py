@@ -996,8 +996,17 @@ def motion_camera_ui_to_dict(ui, old_config=None):
 
     # event end
     on_event_end = ['%(script)s stop %%t' % {'script': meyectl.find_command('relayevent')}]
-    
+
+    if ui['web_hook_notifications_enabled']:
+        url = re.sub('\\s', '+', ui['web_hook_notifications_url'])
+
+        on_event_end.append("%(script)s '%(method)s' '%(url)s'" % {
+                'script': meyectl.find_command('webhook'),
+                'method': ui['web_hook_notifications_http_method'],
+                'url': url.replace("true", "false")})
+
     data['on_event_end'] = '; '.join(on_event_end)
+    print data['on_event_end']
     
     # movie end
     on_movie_end = ['%(script)s movie_end %%t %%f' % {'script': meyectl.find_command('relayevent')}]
